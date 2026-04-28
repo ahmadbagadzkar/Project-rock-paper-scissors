@@ -1,72 +1,87 @@
-function getComputerChoice(){
+// variable global
+let human = null;
+let countHuman = 0;
+let countComp = 0;
+let pesan;
+let rounde = 1;
+let rondeNow = 0;
+let gameOver = false;
+
+function compChoice(){
     const computer = Math.floor(Math.random() * 3);
     return computer;
-}
+};
 
-function getHumanChoice(){
-    let manusia = prompt("=== Masukkan Jurus! ===");
-    let lowercase = manusia.toLowerCase();
+function humanChoice(pilihan){
+    human = pilihan;
 
-    if(lowercase === "batu"){
-        return 0;
-    }else if(lowercase === "gunting"){
-        return 1;
-    }else if(lowercase === "kertas"){
-        return 2;
-    }else{
-        return "Jurus tidak ditemukan";
+    if(human === 0){
+        human = 0;
+        console.log(human);
+        return;
+    }
+    else if(human === 1){
+        human = 1;
+        console.log(human);
+        return;
+    }
+    else if(human === 2){
+        human = 2;
+        console.log(human);
+        return;
+    }
+    else{
+        human = null;
+        console.log(human);
+        return;
     }
 }
 
 function playRound(){
-    let comp = getComputerChoice();
-    let humanRaw = getHumanChoice();
+    const comp = compChoice();
+    const humanChoice = human;
+    console.log(comp);
+    console.log(humanChoice);
 
-    console.log("comp", comp, typeof comp);
-    console.log("humanRaw", humanRaw, typeof comp);
-
-    if(humanRaw === "Jurus tidak ditemukan"){
-        return "Jurus tidak ditemukan, harap masukkan batu, gunting, atau kertas!";
-    }
-
-    let human = Number(humanRaw);
-
-    if(isNaN(human)){
-        return "Input tidak valid";
-    }
-
-    if(comp === human){
-        let pesan = "Anda Seri"
-        return {pesan: pesan};
+    if(comp === humanChoice){
+        pesan = "Anda seri!";
+        console.log(pesan);
+        return {status: "seri", pesan: pesan};
     }
 
     // batu
     if(human === 0 && comp === 1){
-        let pesan = "Kamu Menang! Batu Memukul Gunting.";
+        pesan = "Kamu Menang! Batu Memukul Gunting.";
+        console.log(pesan);
         return{status: "menang", pesan: pesan};
     }
     else if(human === 1 && comp === 0){
-        let pesan = "Kamu Menang! Batu Memukul Gunting.";
+        pesan = "Kamu Menang! Batu Memukul Gunting.";
+        console.log(pesan);
         return{status: "kalah", pesan: pesan};
     }
 
     // gunting
     else if(human === 1 && comp === 2){
-        let pesan = "Kamu Menang! Gunting Menggunting Kertas.";
+        pesan = "Kamu Menang! Gunting Menggunting Kertas.";
+        console.log(pesan);
         return{status: "menang", pesan: pesan};
     }
     else if(human === 2 && comp === 1){
-        let pesan = "Kamu Kalah! Gunting Menggunting Kertas.";
+        pesan = "Kamu Kalah! Gunting Menggunting Kertas.";
+        console.log(pesan);
         return{status: "kalah", pesan: pesan};
     }
 
     // kertas
     else if(human === 2 && comp === 0){
-        let pesan = "Kamu Menang! Kertas Membungkus Batu.";
+        pesan = "Kamu Menang! Kertas Membungkus Batu.";
+        console.log(pesan);
         return{status: "menang", pesan: pesan};
     }
     else if(human === 0 && comp === 2){
-        let pesan = "Kamu Kalah! Kertas Membungkus Batu.";
+        pesan = "Kamu Kalah! Kertas Membungkus Batu.";
+        console.log(pesan);
         return{status: "kalah", pesan: pesan};
     }
     else{
@@ -74,51 +89,135 @@ function playRound(){
     }
 }
 
-function checkScore(){
+function updateScore(){
+    if(human === null || gameOver) return;
 
-    let countHuman = 0;
-    let countComp = 0;
-    let massage;
-    let pesan = ["Selamat kamu menang!!", "Sayang sekali, kamu kalah", "Yah, seimbang. Dicoba lagi ya"];
+    rondeNow++;
 
-    for(let i = 0; i < 5; i++){
+    let hasil = playRound();
+    const textScore = document.createElement("li");
+    textScore.textContent = `Rounde ${rondeNow}: ${hasil.pesan}`;
+    boxAlur.appendChild(textScore);
 
-        let hasil = playRound();
-        massage = hasil
-        console.log(`Ronde ${i+1}: ${massage["pesan"]}`);
+    if(hasil["status"] === "seri"){
+        countHuman;
+        countComp;
+    };
 
-        if(massage["status"] === "menang"){
-            countHuman+=1;
-            countComp;
-        }
-        else if(massage["status"] === "kalah"){
-            countHuman;
-            countComp+=1
-        }else if(massage["status"] !== 0 && massage["status"] !== 1){
-            countComp;
-            countHuman;
-        }
-        else{
-            return "Terjadi Kesalahan.";
-        }
-    }
-
-    if(countHuman > countComp){
-        return `${pesan[0]} --!-- Score = Kamu ${countHuman} - Komputer ${countComp}`;
-    }else if(countHuman < countComp){
-        return `${pesan[1]} --!-- Score = Kamu ${countHuman} - Komputer ${countComp}`;
+    if(hasil["status"] === "menang"){
+        countHuman+=1;
+        scoreHuman.textContent = countHuman;
+    }else if(hasil["status"] === "kalah"){
+        countComp+=1;
+        scoreComp.textContent = countComp;
     }else{
-        return `${pesan[2]} --!-- Score = Kamu ${countHuman} - Komputer ${countComp}`;
+        countComp;
+        countHuman;
     }
+
+    human = null;
+    choice.textContent = "Pilih Jurusmu!";
+    main.disabled = true;
+
+    if(rondeNow >= rounde){
+        gameOver = true;
+        infoRounde.textContent = `Rounde ${rondeNow} / ${rounde}`;
+        tampilkanHasilAkhir();
+        return;
+    }
+
+    infoRounde.textContent = `Rounde ${rondeNow} / ${rounde}`;
 }
 
-// let checkHasil = checkScore();
-// function playGame(checkHasil){
-//     for(let i = 0; i < 5; i++){
+function tampilkanHasilAkhir(){
+    let hasilakhir;
 
-//     }
-// }
+    if(countHuman > countComp){
+        hasilakhir = `Kamu menang!! Skor Kamu: ${countHuman} -- Computer: ${countComp}`;
+    }else if(countComp > countHuman){
+        hasilakhir = `Kamu kalah!! Skor Kamu: ${countHuman} -- Computer: ${countComp}`;
+    }else{
+        hasilakhir = `Seri!! Skor Kamu: ${countHuman} -- Computer: ${countComp}`;
+    }
 
-console.log(checkScore());
-// checkScore(hasil);
-// console.log(hasil);
+    pesanAkhir.setAttribute("style", "font-size: 28px; color: darkgreen;");
+    pesanAkhir.textContent = hasilakhir;
+    boxHasil.appendChild(pesanAkhir);
+
+    getBatu.disabled = true;
+    getGunting.disabled = true;
+    getKertas.disabled = true;
+    main.disabled = true;
+}
+
+function resetGame(){
+
+    human = null;
+    countHuman = 0;
+    countComp = 0;
+    rondeNow = 0;
+    gameOver = false;
+
+    scoreHuman.textContent = 0;
+    scoreComp.textContent = 0;
+
+    choice.textContent = "Pilih Jurusmu!"; 
+    boxAlur.innerHTML = '';
+    pesanAkhir.textContent = "";
+
+    getBatu.disabled = false;
+    getGunting.disabled = false;
+    getKertas.disabled = false;
+    main.disabled = true;
+
+    inputRounde = parseInt(prompt("Mau berapa Rounde?"));
+
+    if(isNaN(inputRounde) || inputRounde <= 0){
+        rounde = 1;
+    }else{
+        rounde = inputRounde;
+    }
+
+    infoRounde.textContent = `Rounde ${rondeNow} / ${rounde}`;
+}
+
+
+// getDocument
+
+// choice
+const choice = document.getElementById("Choice");
+
+// score
+const scoreHuman = document.getElementById("scoreHuman");
+const scoreComp = document.getElementById("scoreComp");
+const boxAlur = document.getElementById("box");
+const boxHasil = document.querySelector(".containerHasil");
+const infoRounde = document.getElementById("infoRounde");
+const pesanAkhir = document.createElement("p");
+
+// button
+const getBatu = document.getElementById("batu");
+const getGunting = document.getElementById("gunting");
+const getKertas = document.getElementById("kertas");
+const main = document.getElementById("main");
+const btnReset = document.getElementById("btnReset");
+
+// runButton
+
+getBatu.addEventListener('click', () => {
+    humanChoice(0);
+    choice.textContent = "Pilihan Kamu: Batu";
+    main.disabled = false;
+});
+getGunting.addEventListener('click', () => {
+    humanChoice(1);
+    choice.textContent = "Pilihan Kamu: Gunting";
+    main.disabled = false;
+});
+getKertas.addEventListener('click', () => {
+    humanChoice(2);
+    choice.textContent = "Pilihan Kamu: Kertas";
+    main.disabled = false;
+});
+main.addEventListener('click', () => updateScore());
+btnReset.addEventListener('click', () => resetGame());
